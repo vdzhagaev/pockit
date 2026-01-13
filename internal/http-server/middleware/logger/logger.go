@@ -22,19 +22,19 @@ func New(log *slog.Logger) func(next http.Handler) http.Handler {
 				slog.String("user_agent", req.UserAgent()),
 				slog.String("request_id", middleware.GetReqID(req.Context())),
 			)
-			wrappedResponseWriter := middleware.NewWrapResponseWriter(writer, req.ProtoMajor)
+			wrapResponseWriter := middleware.NewWrapResponseWriter(writer, req.ProtoMajor)
 
 			startTime := time.Now()
 
 			defer func() {
 				entry.Info("request completed",
-					slog.Int("status", wrappedResponseWriter.Status()),
-					slog.Int("bytes", wrappedResponseWriter.BytesWritten()),
+					slog.Int("status", wrapResponseWriter.Status()),
+					slog.Int("bytes", wrapResponseWriter.BytesWritten()),
 					slog.String("duration", time.Since(startTime).String()),
 				)
 			}()
 
-			next.ServeHTTP(wrappedResponseWriter, req)
+			next.ServeHTTP(wrapResponseWriter, req)
 		}
 
 		return http.HandlerFunc(fn)

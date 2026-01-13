@@ -2,8 +2,10 @@ package main
 
 import (
 	"log/slog"
+	"net/http"
 	"os"
 	"url-shortener/internal/config"
+	"url-shortener/internal/http-server/handlers/url/save"
 	"url-shortener/internal/http-server/middleware/logger"
 	"url-shortener/internal/lib/logger/handlers/slogpretty"
 	"url-shortener/internal/lib/logger/slogx"
@@ -35,12 +37,34 @@ func main() {
 
 	router := chi.NewRouter()
 
+	// --- MIDDLEWARES ---
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
 	// router.Use(middleware.Logger)
 	router.Use(logger.New(log))
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.URLFormat)
 
-	// TODO: run server
+	// --- HANDLERS ---
+	router.Post("/url", save.New(log, storage))
+
+	// --- SERVER CONFIG ---
+	server := &http.Server{
+		Addr:         cfg.Address,
+		Handler:      router,
+		ReadTimeout:  cfg.HTTPServer.Timeout,
+		WriteTimeout: cfg.HTTPServer.Timeout,
+		IdleTimeout:  cfg.HTTPServer.IdleTimeout,
+	}
+
+	log.Info("starting server", slog.String("address", cfg.Address))
+
+	// blocking function
+	if err := server.ListenAndServe(); err != nil {
+		log.Error("failed to start server", slogx.Err(err))
+	}
+
+	log.Error("server stopped")
 }
 
 func setupLogger(env string) *slog.Logger {
