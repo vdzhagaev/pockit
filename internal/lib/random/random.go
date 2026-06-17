@@ -2,6 +2,7 @@ package random
 
 import (
 	"crypto/rand"
+	"fmt"
 )
 
 type Generator struct {
@@ -42,7 +43,7 @@ func NewRandomString(size int) (string, error) {
 	str, err := generator.Generate()
 
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to generate random string: %w", err)
 	}
 
 	return str, nil
