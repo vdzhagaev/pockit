@@ -1,6 +1,6 @@
 # pockit
 
-> A self-hostable **pocket toolkit bot** for Telegram & Slack — small, genuinely useful tools you can call from any chat, built on a pluggable `Tool` architecture.
+> A **pocket toolkit bot** for Telegram & Slack — small, genuinely useful tools you can call from any chat, built on a pluggable `Tool` architecture. Designed to run as a hosted, multi-tenant service.
 
 🚧 **Status: in progress / pivoting.** This repo started life as a Go URL-shortener service and is being evolved into `pockit`. The URL-shortener below is the **first tool** and the working core; the messenger adapters and additional tools are on the roadmap.
 
@@ -27,7 +27,7 @@ The URL-shortener core is implemented as an HTTP service:
 - Create short aliases (custom or auto-generated) for URLs
 - Redirect by alias
 - Delete aliases
-- SQLite persistence (pure-Go driver, no CGo)
+- Persistence behind a storage interface (SQLite today; **migrating to PostgreSQL** for the hosted, multi-tenant deployment — see roadmap)
 - Structured logging (`slog`) with environment-aware output (pretty for local, JSON for dev/prod)
 - Config via YAML + environment variables
 - HTTP Basic Auth on write endpoints
@@ -39,7 +39,7 @@ The URL-shortener core is implemented as an HTTP service:
 |------|--------|
 | Language | Go 1.25 |
 | HTTP router | [chi](https://github.com/go-chi/chi) v5 |
-| Storage | SQLite via [`modernc.org/sqlite`](https://gitlab.com/cznic/sqlite) (pure Go) |
+| Storage | SQLite today → **PostgreSQL** ([`pgx`](https://github.com/jackc/pgx)) for the hosted deployment |
 | Config | [cleanenv](https://github.com/ilyakaznacheev/cleanenv) (YAML + env) |
 | Logging | stdlib `log/slog` + custom pretty handler |
 | Validation | [validator/v10](https://github.com/go-playground/validator) |
@@ -64,10 +64,10 @@ http_server:
   user: "admin"
 ```
 
-The Basic Auth password is supplied separately via the `HTTP_SERVER_PASSWORD` env var (never commit it). For local runs these are set in `local.env`:
+The Basic Auth password is supplied separately via the `HTTP_SERVER_PASSWORD` env var (never commit it). Copy `local.env.example` to `local.env` and fill it in:
 
 ```env
-CONFIG_PATH=./config/local.yaml
+CONFIG_PATH=config/local.yaml
 HTTP_SERVER_PASSWORD=change-me
 ```
 
@@ -97,6 +97,7 @@ A [Bruno](https://www.usebruno.com/) collection for these endpoints is included 
 ## Roadmap
 
 - [x] URL-shortener core (HTTP API + SQLite)
+- [ ] Migrate storage to **PostgreSQL** (pgx) for the hosted deployment
 - [ ] Extract a generic `Tool` interface + tool router
 - [ ] Rename Go module to `github.com/vdzhagaev/pockit`
 - [ ] Telegram adapter (`/short`, etc.)
