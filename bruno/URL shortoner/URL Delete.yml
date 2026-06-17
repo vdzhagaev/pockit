@@ -1,0 +1,20 @@
+info:
+  name: URL Delete
+  type: http
+  seq: 2
+
+http:
+  method: DELETE
+  url: http://localhost:8082/url/{{alias}}
+  auth: inherit
+
+runtime:
+  variables:
+    - name: alias
+      value: u1rgQ5F9
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

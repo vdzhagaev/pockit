@@ -1,0 +1,25 @@
+info:
+  name: URL Save
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8082/url/
+  body:
+    type: json
+    data: |-
+      {
+        "URL": "https://google.com/",
+        "alias": "страна смешариков"
+      }
+  auth:
+    type: basic
+    username: myuser
+    password: "1234"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
