@@ -42,6 +42,7 @@ func New(storagePath string) (*Storage, error) {
 	return &Storage{db: db}, nil
 }
 
+// TODO: Separate errors for uls exists and alias exists.
 func (stg *Storage) SaveURL(urlToSave string, alias string) (int64, error) { // remove int64 mb
 	const op = "storage.sqlite.SaveURL"
 
@@ -69,7 +70,7 @@ func (stg *Storage) SaveURL(urlToSave string, alias string) (int64, error) { // 
 	return id, nil
 }
 
-func (stg *Storage) GetUrl(alias string) (string, error) {
+func (stg *Storage) GetURL(alias string) (string, error) {
 	const op = "storage.sqlite.GetUrl"
 
 	stmt, err := stg.db.Prepare("SELECT url FROM url WHERE alias = ?")
